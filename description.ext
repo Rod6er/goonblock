@@ -1,0 +1,91 @@
+// https://community.bistudio.com/wiki/Description.ext
+
+class Header
+{
+ gameType = COOP;
+ minPlayers = 1;
+ maxPlayers = 12;
+};
+
+
+disabledAI = 1;
+ShowGPS = 1;
+showCompass	= 1;
+showWatch	= 1;
+aiKills		= 0;
+debriefing	= 1;
+author = "Sacha Ligthert, Modified by Soapy , boop";
+onLoadName = "Goonblock Duty";
+onLoadMission = "Let civvies through, stop insurgents from escaping, don't explode.";
+loadScreen = "roadblock_duty.paa";
+overviewPicture = "roadblock_duty.paa";
+enableDebugConsole = 1;
+
+respawn = 3;
+respawnDelay = 10;
+respawnTemplates[] = {"ace_spectator"};
+respawnTemplatesWest[] = {"ace_spectator"};
+
+#include "VVS\menu.h"
+class CfgFunctions
+{
+	#include "VVS\Functions.h"
+};
+
+class CfgDebriefing
+{  
+	class End1
+	{
+		title = "Mission Completed";
+		subtitle = "";
+		description = "road: blocked";
+	};
+};
+
+class Params
+{
+
+	class DayTime //paramsArray[0]
+	{
+		title = "Starting Time";
+		values[] = {3, 4, 5, 6, 13, 17, 18, 20, 1};
+		texts[] = {"0330HRS", "0430HRS", "0530HRS", "0630HRS", "1330HRS", "1730HRS", "1830HRS", "2030HRS", "0130HRS"};
+		default = 3;
+	};
+	class TimeAccel // paramsArray[1]
+	{
+		title = "Time Acceleration (irl:in-game)";
+		values[] = {1,3,6,12,24,60};
+		texts[] = {"None","1:3","1:6","1:12","1:24","1:60"};
+		default = 3;
+	};
+	class Rounds //paramsArray[2]
+	{
+		title = "Roadblocks to complete";
+		values[] = {10,25,50,75,100,1000};
+		texts[] = {"10","25","50","75","100","I want to spend the rest of my life here"};
+		default = 50;
+	};
+	class Debug //paramsArray[3]
+	{
+		title = "Debug";
+		values[] = {0,1};
+		texts[] = {"Disabled","Enabled"};
+		default = 0;
+	};
+	class EventInterval //paramsArray[3]
+	{
+		title = "average event interval(seconds)";
+		values[] = {30,60,90};
+		texts[] = {"30","60","90"};
+		default = 60;
+	};
+	class barbiebox //paramsArray[4]
+	{
+		title = "barbie-box";
+		values[] = {0,1};
+		texts[] = {"not present","present"};
+		default = 1;
+	};
+
+};
