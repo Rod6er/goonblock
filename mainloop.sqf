@@ -45,7 +45,23 @@ _weapons = ["arifle_TRG21_F","rhs_weap_aks74u","rhs_weap_m590_5rd","rhs_weap_akm
 _magazines = ["30Rnd_556x45_Stanag","HandGrenade","9Rnd_45ACP_Mag","SmokeShell","rhs_30rnd_762x39mm"];
 _ieds = ["SatchelCharge_Remote_Mag","DemoCharge_Remote_Mag","IEDUrbanBig_Remote_Mag","IEDLandBig_Remote_Mag","IEDUrbanSmall_Remote_Mag","IEDLandSmall_Remote_Mag"];
 
+// set our eventInterval as per mission parameters
 _eventInterval = "EventInterval" call BIS_fnc_getParamValue;
+
+	
+// if we're on low-intensity mode then revise the lists of stuff
+if ( ( "LowIntensity" call BIS_fnc_getParamValue ) == 1 ) then {
+
+	if (debug == 1) then { hint "low-intensity enabled" };
+
+	_insurgents = ["O_G_engineer_F","O_G_medic_F","O_G_officer_F","O_G_Soldier_A_F","LOP_AM_Infantry_Rifleman",
+	"LOP_AM_Infantry_Rifleman_2","LOP_AM_Infantry_Rifleman_3","LOP_ISTS_Infantry_Rifleman","LOP_ISTS_Infantry_Rifleman_2",
+	"LOP_ISTS_Infantry_Rifleman_3","LOP_AM_Infantry_TL","LOP_AM_Infantry_SL"];
+	_vehicles_ins_weapons = 
+	["O_G_Offroad_01_F","LOP_AM_UAZ_DshKM","LOP_AM_UAZ_SPG"];
+	_vehicles_ins_truck = 
+	["rhs_uaz_open_chdkz","LOP_AFR_Civ_Landrover","LOP_AFR_Civ_Offroad","LOP_AFR_Civ_UAZ","LOP_AFR_Civ_UAZ_Open"];
+};
 
 // The main loop
 _round = 1;
@@ -72,7 +88,12 @@ while { _round != rounds } do {
 	if ( _chance != 2 ) then {
 
 		_rnd_action =  ceil random 4;
+		// no carbombs for low-intensity
+		if( ( "LowIntensity" call BIS_fnc_getParamValue ) == 1 ) then {
+			_rnd_action = ceil random 3;
+		};
 
+		// event : truck of badguys race through or unload and attack the checkpoint
 		if ( _rnd_action == 1 ) then {
 			_action = ["RACE","UNLOAD","UNLOAD"];
 			_veh_of_choice = _vehicles_ins_truck call bis_fnc_selectRandom;
@@ -81,6 +102,7 @@ while { _round != rounds } do {
 			_units = [_insurgents,_numberOfCargoUnits] call sl_fnc_compileGroup;
 		};
 
+		// event : armedvehicle of badguys race through or attack the checkpoint
 		if ( _rnd_action == 2 ) then {
 			_action = ["ATTACK","ATTACK","RACE"];
 			_veh_of_choice = _vehicles_ins_weapons call bis_fnc_selectRandom;
@@ -89,6 +111,7 @@ while { _round != rounds } do {
 			_units = [_insurgents,_numberOfCrewUnits] call sl_fnc_compileGroup;
 		};
 
+		// event : civilian vehicle attempts smuggle arms through
 		if ( _rnd_action == 3 ) then {
 			_action = ["MOVE"];
 			_veh_of_choice = _vehicles_civs call bis_fnc_selectRandom;
@@ -101,6 +124,7 @@ while { _round != rounds } do {
 
 		};
 
+		// event : carbomb
 		if ( _rnd_action == 4 ) then {
 			_action = ["RACE"];
 			_veh_of_choice = _vehicles_civs call bis_fnc_selectRandom;
@@ -115,19 +139,21 @@ while { _round != rounds } do {
 
 		};
 
+		// spawns our group of either opfor or civilian side (for smuggle),
 		if ( _rnd_action == 3 ) then {
 			_grp = [getPos _veh, civilian,_units] call BIS_fnc_spawnGroup;
 		} else {
 			_grp = [getPos _veh, EAST,_units] call BIS_fnc_spawnGroup;
 		};
+		// spawns and orders our group in
 		_grp addVehicle _veh;
 		{ [_x] orderGetIn true; } forEach units _grp;
-
+		// gives our group one of set of waypoints , see functions.sqf
 		null = [_grp,(_action call bis_fnc_selectRandom)] call sl_fnc_createWaypoints;
 
 	};
 
-	//wait for about event interval time
+	// sets wait period for about event interval time
 	_wait = (_eventInterval - 10 + (random 20));
 
 	if (debug == 1) then {
@@ -137,6 +163,7 @@ while { _round != rounds } do {
 		publicVariable "pvHint";
 	};
 
+	// waits, increments roundnumber, and resets our event selectors
 	sleep _wait;
 	_round = _round + 1;
 	_chance = 0;

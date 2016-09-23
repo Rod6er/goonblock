@@ -87,5 +87,12 @@ class Params
 		texts[] = {"not present","present"};
 		default = 1;
 	};
+	class lowIntensity //paramsArray[5]
+	{
+		title = "low-intensity mode(limited enemy roster, no carbombs)";
+		values[] = {0,1};
+		texts[] = {"standard intensity","low intensity"};
+		default = 0;
+	};
 
 };
